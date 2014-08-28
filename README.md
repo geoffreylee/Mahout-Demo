@@ -1,7 +1,7 @@
 Mahout-Demo by Geoffrey Lee (c) Tamber, Inc. 2014
 =================================================
 
-This is the code which I developed in order to build a basic impelmentation of an Apache Mahout User Based Recommender. The recommender is compared against Tamber's proprietary recommendation engine named Engie with regards to speed and accuracy. The comparison test is currently hosted at http://engie.org/index_new.html although there are plans to move this page to http://engie.org
+This is the code which I developed in order to build a basic implementation of an Apache Mahout User Based Recommender. The recommender is compared against Tamber's proprietary recommendation engine named Engie with regards to speed and accuracy. The comparison test is currently hosted at http://engie.org/index_new.html although there are plans to move this page to http://engie.org
 
 Right now, Mahout is being trained on the Movie Lens database; the file that I have included is the 100k ratings file. The file which the demo hosted at engie.org is trained on is the 10M ratings file (if you want Mahout to parse the 10M on a medium instance you have to give the VM more heap space via command line).
 
