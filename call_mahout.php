@@ -1,8 +1,19 @@
 <?php
-/* A basic PHP wrapper of the Mahout API 
- * returns results in JSON format
- * by Geoffrey Lee (c) Tamber, Inc. 2014
- */
+/*  Copyright 2014 Tamber, Inc. 
+	Developed by Geoffrey Lee
+
+   	Licensed under the Apache License, Version 2.0 (the "License");
+   	you may not use this file except in compliance with the License.
+   	You may obtain a copy of the License at
+
+       	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
 
 /* USAGE: pass the script the field likes with ID's separated by \x1f;
  * For example: http://yourdomain.com/call_mahout.php?likes=100\x1f25
