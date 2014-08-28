@@ -1,8 +1,22 @@
-/* This is the actual server side api
- * It listens on port 24579 for commands
- * Written by Geoffrey Lee (c) Tamber, Inc. 2014
- */
+/*  Copyright 2014 Tamber, Inc. 
+	Developed by Geoffrey Lee
 
+   	Licensed under the Apache License, Version 2.0 (the "License");
+   	you may not use this file except in compliance with the License.
+   	You may obtain a copy of the License at
+
+       	http://www.apache.org/licenses/LICENSE-2.0
+
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+*/
+
+/* This app is a basic server side implementation of the Mahout User Based Recommendation Engine
+ * It listens for API commands on port 24579 a command of the form "rec space_separated_ids" or "quit"
+ */
 package Recommender;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
