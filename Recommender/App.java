@@ -1,22 +1,8 @@
-/*  Copyright 2014 Tamber, Inc. 
-	Developed by Geoffrey Lee
-
-   	Licensed under the Apache License, Version 2.0 (the "License");
-   	you may not use this file except in compliance with the License.
-   	You may obtain a copy of the License at
-
-       	http://www.apache.org/licenses/LICENSE-2.0
-
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
-*/
-
-/* This app is a basic server side implementation of the Mahout User Based Recommendation Engine
- * It listens for API commands on port 24579 a command of the form "rec space_separated_ids" or "quit"
+/* This is the actual server side api
+ * It listens on port 24579 for commands
+ * Written by Geoffrey Lee (c) Tamber, Inc. 2014
  */
+
 package Recommender;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -25,11 +11,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
+
 import Recommender.ItemRecommend; 
 
 public class App {
+	private static final Logger logger = Logger.getLogger(App.class.getName());
 	public static void main(String[] args) throws Exception {
 		try {
 			// Where Mahout will listen
@@ -79,7 +70,11 @@ public class App {
 				socket.close();
 			}
 		} catch (TasteException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			logger.log(Level.SEVERE, e.toString());
+		} catch (NullPointerException e) {
+			//e.printStackTrace();
+			logger.log(Level.SEVERE, e.toString());
 		}
 	}
 }

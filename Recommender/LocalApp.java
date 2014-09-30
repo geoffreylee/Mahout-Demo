@@ -1,20 +1,8 @@
-/*  Copyright 2014 Tamber, Inc. 
-	Developed by Geoffrey Lee
+/* This is a local implementation  without the sockets stuff
+ * It listens on port 24579 for commands
+ * Written by Geoffrey Lee (c) Tamber, Inc. 2014
+ */
 
-   	Licensed under the Apache License, Version 2.0 (the "License");
-   	you may not use this file except in compliance with the License.
-   	You may obtain a copy of the License at
-
-       	http://www.apache.org/licenses/LICENSE-2.0
-
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
-*/
-
-/* This is a local implementation  without the sockets stuff*/
 package Recommender;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +23,8 @@ public class LocalApp {
 			long myId = Mahout.getSessionId();
 			List<Long> prefs = new ArrayList<Long>();
 			List<Float> vals = new ArrayList<Float>();
-			for(int j = 1; j < args.length; j++) {
+			//System.out.println(args[0]);
+			for(int j = 0; j < args.length; j++) {
 				prefs.add(Long.parseLong(args[j]));
 						
 				// we hard code the value of 4.0 for each preference because this is what we do for the Engie recs
@@ -55,6 +44,9 @@ public class LocalApp {
 			
 		} catch (TasteException e) {
 			e.printStackTrace();
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			System.out.println("try again");
 		}
 	}
 }
