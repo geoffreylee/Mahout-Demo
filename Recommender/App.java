@@ -28,7 +28,8 @@ public class App {
 			ServerSocket serverSocket = new ServerSocket(portNumber);
 	
 			// Initialize; right now the format is for a csv training file though this could easily be made into a db
-			ItemRecommend Mahout = new ItemRecommend("data/users.data.csv", 4, 100);
+			// 100 NN
+			ItemRecommend Mahout = new ItemRecommend("data/users.data.csv", 100, 100);
 			
 			// Listen
 			while(true) {
@@ -51,7 +52,7 @@ public class App {
 						vals.add(new Float(4.0));
 						Mahout.writeTempUserPreferences(myId, prefs, vals);
 					}
-					List<RecommendedItem> recommendations = Mahout.getRecommendations(myId, 20);
+					List<RecommendedItem> recommendations = Mahout.getRecommendations(myId, 50);
 					String recs = "";
 					for(RecommendedItem recommendation : recommendations) {
 						long itemID = recommendation.getItemID();
