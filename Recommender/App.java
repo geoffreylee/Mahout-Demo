@@ -22,16 +22,17 @@ import Recommender.ItemRecommend;
 public class App {
 	private static final Logger logger = Logger.getLogger(App.class.getName());
 	public static void main(String[] args) throws Exception {
-		try {
-			// Where Mahout will listen
-			final int portNumber = 24579;
-			ServerSocket serverSocket = new ServerSocket(portNumber);
-	
-			// Initialize; right now the format is for a csv training file though this could easily be made into a db
-			ItemRecommend Mahout = new ItemRecommend("data/users.data.csv", 4, 100);
+		
+		// Where Mahout will listen
+		final int portNumber = 24579;
+		ServerSocket serverSocket = new ServerSocket(portNumber);
+		// Initialize; right now the format is for a csv training file though this could easily be made into a db
+		ItemRecommend Mahout = new ItemRecommend("data/users.data.csv", 100, 100, "loglikelihood");
 			
-			// Listen
-			while(true) {
+		// Listen
+		//Integer n = 0;
+		while(true) {	
+			try {
 				Socket socket = serverSocket.accept();
 				PrintWriter pw = new PrintWriter(socket.getOutputStream(), true);
 				BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -40,6 +41,7 @@ public class App {
 
 				// The API commands
 				if(heard[0].equals("rec")) {
+					//n += 1;
 					long myId = Mahout.getSessionId();
 					List<Long> prefs = new ArrayList<Long>();
 					List<Float> vals = new ArrayList<Float>();
@@ -51,12 +53,26 @@ public class App {
 						vals.add(new Float(4.0));
 						Mahout.writeTempUserPreferences(myId, prefs, vals);
 					}
-					List<RecommendedItem> recommendations = Mahout.getRecommendations(myId, 20);
+					List<RecommendedItem> recommendations = Mahout.getRecommendations(myId, 300);
 					String recs = "";
 					for(RecommendedItem recommendation : recommendations) {
 						long itemID = recommendation.getItemID();
 						recs = recs + itemID + ":"+ recommendation.getValue() + " ";
 					}
+					recs = recs + "\n";
+					pw.println(recs);
+					Mahout.deleteTempUserPreferences(myId);
+				} else if(heard[0].equals("uid")) {
+					//logger.log(Level.INFO, "uid invoked");
+					Long uid = Long.parseLong(heard[1]);
+					//logger.log(Level.INFO, "uid " + uid.toString());
+					List<RecommendedItem> recommendations = Mahout.getRecommendations(uid, 100);
+					String recs = "";
+					for(RecommendedItem recommendation: recommendations) {
+						long itemID = recommendation.getItemID();
+						recs = recs + itemID + ":" + recommendation.getValue() + " ";
+					}
+					//logger.log(Level.INFO, "recs " + recs);
 					recs = recs + "\n";
 					pw.println(recs);
 				} else if(heard[0].equals("quit")) {
@@ -68,13 +84,14 @@ public class App {
 				}
 				pw.close();
 				socket.close();
+			} catch (TasteException e) {
+				//e.printStackTrace();
+				logger.log(Level.SEVERE, e.toString());
+			} catch (NullPointerException e) {
+				//e.printStackTrace();
+				logger.log(Level.SEVERE, e.toString());
+				//logger.log(Level.SEVERE, "Behavior number: " + n.toString());
 			}
-		} catch (TasteException e) {
-			//e.printStackTrace();
-			logger.log(Level.SEVERE, e.toString());
-		} catch (NullPointerException e) {
-			//e.printStackTrace();
-			logger.log(Level.SEVERE, e.toString());
-		}
+		} 
 	}
 }

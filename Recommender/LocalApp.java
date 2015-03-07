@@ -17,7 +17,7 @@ public class LocalApp {
 				System.out.println("No tastes passed");
 			}
 			// Initialize; right now the format is for a csv training file though this could easily be made into a db
-			ItemRecommend Mahout = new ItemRecommend("data/users.data.csv", 4, 100);
+			ItemRecommend Mahout = new ItemRecommend("data/users.data.csv", 4, 100, "default");
 			
 			// Listen
 			long myId = Mahout.getSessionId();

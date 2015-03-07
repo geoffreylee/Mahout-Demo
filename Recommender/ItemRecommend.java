@@ -10,18 +10,24 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.GenericUserPreferenceArray;
 import org.apache.mahout.cf.taste.impl.model.PlusAnonymousConcurrentUserDataModel;
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
 import org.apache.mahout.cf.taste.impl.neighborhood.NearestNUserNeighborhood;
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
+import org.apache.mahout.cf.taste.impl.similarity.EuclideanDistanceSimilarity;
 import org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity;
+import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
+import org.apache.mahout.cf.taste.impl.similarity.TanimotoCoefficientSimilarity;
+import org.apache.mahout.cf.taste.impl.similarity.UncenteredCosineSimilarity;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.model.PreferenceArray;
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.similarity.UserSimilarity;
+
 
 public class ItemRecommend {
 	private DataModel dm;
@@ -32,16 +38,34 @@ public class ItemRecommend {
 	private int concurrentUsers;
 	private static final Logger logger = Logger.getLogger(ItemRecommend.class.getName());
 
-	public ItemRecommend(String training, int nearestN, int concurrent){
+
+	public ItemRecommend(String training, int nearestN, int concurrent, String similarity_model){
 		try {
 			logger.log(Level.INFO, "Initializing");
 			concurrentUsers = concurrent;
 			// set up to have the data model be read from a file though one could switch this to a db
 			dm = new FileDataModel(new File(training));
 			tempdm = new PlusAnonymousConcurrentUserDataModel(dm, concurrentUsers);
-			userSimilarity = new LogLikelihoodSimilarity(tempdm);
+
+			
+			//NB: DESPITE NAME USERSIMILARITY IS ACTUALLY TYPED ItemSimilarity
+			if(similarity_model.equals("loglikelihood")) {
+				userSimilarity = new LogLikelihoodSimilarity(tempdm);
+			} else if (similarity_model.equals("pearson")) {
+				userSimilarity = new PearsonCorrelationSimilarity(tempdm);
+			} else if (similarity_model.equals("euclidean")) {
+				userSimilarity = new EuclideanDistanceSimilarity(tempdm);
+			} else if (similarity_model.equals("tanimoto")) {
+				userSimilarity = new TanimotoCoefficientSimilarity(tempdm);
+			} else if (similarity_model.equals("cosine")) {
+				userSimilarity = new UncenteredCosineSimilarity(tempdm);
+			} else {
+				logger.log(Level.INFO, "Similarity model not recognized, defaulting to loglikelihood");
+				userSimilarity = new LogLikelihoodSimilarity(tempdm);
+			}
 			neighborhood = new NearestNUserNeighborhood(nearestN, userSimilarity, tempdm);
 			recommender = new GenericUserBasedRecommender(tempdm, neighborhood, userSimilarity);
+			//recommender = new GenericItemBasedRecommender(tempdm, userSimilarity);
 			logger.log(Level.INFO, "Mahout ready");
 		} catch (TasteException e) {
 			logger.log(Level.SEVERE, e.toString());
@@ -49,6 +73,7 @@ public class ItemRecommend {
 			logger.log(Level.SEVERE, e.toString());
 		}
 	}
+	
 	
 	// Sets a temporary session ID for multi-thread safe writing
 	public long getSessionId() throws IOException {
