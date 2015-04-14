@@ -15,12 +15,16 @@ import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.GenericUserPreferenceArray;
 import org.apache.mahout.cf.taste.impl.model.PlusAnonymousConcurrentUserDataModel;
 import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
-import org.apache.mahout.cf.taste.impl.recommender.CachingRecommender;
+import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.model.PreferenceArray;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
+import org.apache.mahout.cf.taste.similarity.CachingItemSimilarity;
+import org.apache.mahout.cf.taste.impl.recommender.knn.KnnItemBasedRecommender;
+import org.apache.mahout.cf.taste.impl.recommender.knn.Optimizer;
+import org.apache.mahout.cf.taste.impl.recommender.knn.NonNegativeQuadraticOptimizer;
 
 
 public class ItemRecommend {
@@ -30,11 +34,11 @@ public class ItemRecommend {
 	private ItemSimilarity itemSimilarity;
 	//private UserNeighborhood neighborhood; 
 	//private GenericUserBasedRecommender recommender;
-	private GenericItemBasedRecommender irecommender;
 	private int concurrentUsers;
 	private static final Logger logger = Logger.getLogger(ItemRecommend.class.getName());
-	private CachingRecommender recommender;
-
+	private Recommender recommender;
+	private Optimizer optimizer;
+	private int useKNN = false; // Use KnnItemBasedRecommender
 
 	public ItemRecommend(String training, int nearestN, int concurrent, String similarity_model){
 		try {
@@ -64,8 +68,14 @@ public class ItemRecommend {
 			//neighborhood = new NearestNUserNeighborhood(nearestN, userSimilarity, tempdm);
 			//recommender = new GenericUserBasedRecommender(tempdm, neighborhood, userSimilarity);
 			
-			irecommender = new GenericItemBasedRecommender(tempdm, itemSimilarity);
-			recommender = new CachingRecommender(irecommender);
+			itemSimilarity = new LogLikelihoodSimilarity(tempdm);
+			itemSimilarity = new CachingItemSimilarity(itemSimilarity, 10*tempdm.getNumItems());
+			if useKNN {
+				optimizer = new NonNegativeQuadraticOptimizer();
+				recommender = new KnnItemBasedRecommender(tempdm, itemSimilarity, optimizer, nearestN);
+			} else {
+				recommender = new GenericItemBasedRecommender(tempdm, itemSimilarity);
+			}
 			logger.log(Level.INFO, "Mahout ready");
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.toString());
